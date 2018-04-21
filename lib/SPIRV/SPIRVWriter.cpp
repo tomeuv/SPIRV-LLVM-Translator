@@ -833,6 +833,9 @@ SPIRVInstruction *LLVMToSPIRV::transLifetimeIntrinsicInst(Op OC,
 
   if (auto AI = dyn_cast<AllocaInst>(Op1)) {
     (void)AI;
+    if (!AI->getAllocatedType()->isVoidTy() ||
+        !BM->hasCapability(CapabilityAddresses))
+      Size = 0;
     assert((!Size || M->getDataLayout().getTypeSizeInBits(
                          AI->getAllocatedType()) == (uint64_t)(Size * 8)) &&
            "Size of the argument should match the allocated memory");
@@ -850,6 +853,9 @@ SPIRVInstruction *LLVMToSPIRV::transLifetimeIntrinsicInst(Op OC,
         "The only users of this bitcast instruction are lifetime intrinsics");
   }
   auto AI = dyn_cast<AllocaInst>(dyn_cast<BitCastInst>(Op1)->getOperand(0));
+  if (!AI->getAllocatedType()->isVoidTy() ||
+      !BM->hasCapability(CapabilityAddresses))
+    Size = 0;
   assert(AI &&
          (!Size || M->getDataLayout().getTypeSizeInBits(
                        AI->getAllocatedType()) == (uint64_t)(Size * 8)) &&
