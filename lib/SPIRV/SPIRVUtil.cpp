@@ -105,7 +105,7 @@ void saveLLVMModule(Module *M, const std::string &OutputFile) {
     return;
   }
 
-  WriteBitcodeToFile(*M, Out.os());
+  WriteBitcodeToFile(M, Out.os());
   Out.keep();
 }
 
