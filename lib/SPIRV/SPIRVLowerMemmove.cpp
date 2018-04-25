@@ -80,7 +80,7 @@ public:
       // The source could be bit-cast from another type,
       // need the original type for the allocation of the temporary variable
       SrcTy = cast<BitCastInst>(Src)->getOperand(0)->getType();
-    auto Align = I.getSourceAlignment();
+    auto Align = I.getAlignment();
     auto Volatile = I.isVolatile();
     Value *NumElements = nullptr;
     uint64_t ElementsCount = 1;
@@ -96,11 +96,10 @@ public:
 
     auto *Alloca =
         Builder.CreateAlloca(SrcTy->getPointerElementType(), NumElements);
-    Alloca->setAlignment(Align);
     Builder.CreateLifetimeStart(Alloca);
-    Builder.CreateMemCpy(Alloca, Align, Src, Align, Length, Volatile);
-    auto *SecondCpy = Builder.CreateMemCpy(Dest, I.getDestAlignment(), Alloca,
-                                           Align, Length, Volatile);
+    Builder.CreateMemCpy(Alloca, Src, Length, Align, Volatile);
+    auto *SecondCpy = Builder.CreateMemCpy(Dest, Alloca, Length, Align,
+        Volatile);
     Builder.CreateLifetimeEnd(Alloca);
 
     SecondCpy->takeName(&I);
