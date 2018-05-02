@@ -7,13 +7,17 @@ set(LLVM_LINK_COMPONENTS
   Support
   TransformUtils
 
-  SPIRVLib
+  LLVMSPIRVLib
 )
 
 add_llvm_tool(llvm-spirv
   llvm-spirv.cpp
   # llvm_setup_rpath messes with the rpath making llvm-spirv not executable from the build directory
   NO_INSTALL_RPATH
+)
+
+target_link_libraries(llvm-spirv PRIVATE
+  LLVMSPIRVLib
 )
 
 target_include_directories(llvm-spirv
